@@ -3,8 +3,9 @@
 # Licensed under a 3-clause BSD style license (see LICENSE)
 from __future__ import division
 
+from decimal import ROUND_HALF_UP, Decimal, getcontext
 import re
-import time 
+import time
 from distutils.version import LooseVersion
 
 import pymongo
@@ -412,6 +413,9 @@ class MongoDb(AgentCheck):
 
     def __init__(self, name, init_config, agentConfig, instances=None):
         AgentCheck.__init__(self, name, init_config, agentConfig, instances)
+
+        # Define the rounding type we will use for this check
+        getcontext().rounding = ROUND_HALF_UP
 
         # Members' last replica set states
         self._last_state_by_server = {}
@@ -1011,16 +1015,14 @@ class MongoDb(AgentCheck):
 
             if ol_options:
                 try:
-                    oplog_data['logSizeMB'] = round(
-                        ol_options['size'] / 2.0 ** 20, 2
-                    )
+                    logSizeMB = ol_options['size'] / 2.0 ** 20
+                    oplog_data['logSizeMB'] = float(Decimal(logSizeMB).quantize(Decimal("2.0")))
 
                     oplog = localdb[ol_collection_name]
 
-                    oplog_data['usedSizeMB'] = round(
-                        localdb.command("collstats", ol_collection_name)['size'] / 2.0 ** 20, 2
-                    )
-
+                    usedSizeMB = localdb.command('collstats', ol_collection_name['size'] / 2.0 ** 20)
+                    oplog_data['usedSizeMB'] = float(Decimal(usedSizeMB).quantize(Decimal("2.0")))
+                    
                     op_asc_cursor = oplog.find({"ts": {"$exists": 1}}).sort("$natural", pymongo.ASCENDING).limit(1)
                     op_dsc_cursor = oplog.find({"ts": {"$exists": 1}}).sort("$natural", pymongo.DESCENDING).limit(1)
 
