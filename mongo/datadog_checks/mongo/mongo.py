@@ -1022,7 +1022,7 @@ class MongoDb(AgentCheck):
 
                     usedSizeMB = localdb.command('collstats', ol_collection_name['size'] / 2.0 ** 20)
                     oplog_data['usedSizeMB'] = float(Decimal(usedSizeMB).quantize(Decimal("2.0")))
-                    
+
                     op_asc_cursor = oplog.find({"ts": {"$exists": 1}}).sort("$natural", pymongo.ASCENDING).limit(1)
                     op_dsc_cursor = oplog.find({"ts": {"$exists": 1}}).sort("$natural", pymongo.DESCENDING).limit(1)
 
