@@ -1,5 +1,9 @@
 # CHANGELOG - postgres
 
+## Unreleased
+
+* [Added] Add `pg_instance:<host-port|/path/to/socket` tag to metrics. See [#2928](https://github.com/DataDog/integrations-core/pull/2928).
+
 ## 2.4.0 / 2019-01-04
 
 * [Added] Bump psycopg2-binary version to 2.7.5. See [#2799](https://github.com/DataDog/integrations-core/pull/2799).
